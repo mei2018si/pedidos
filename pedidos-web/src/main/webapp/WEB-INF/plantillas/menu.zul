@@ -1,0 +1,9 @@
+<toolbar orient="vertical">
+	<toolbarbutton label="Clientes" href="/clientes.zul" />
+	<toolbarbutton label="Articulos" href="/articulos.zul" />
+	<toolbarbutton label="Familias" href="/familias.zul" />
+	<toolbarbutton label="Almacenes" href="/almacenes.zul" />
+	<toolbarbutton label="Pedidos" href="/pedidos.zul" />
+	<separator />
+	<toolbarbutton label="Principal" href="/index.zul" />
+</toolbar>
