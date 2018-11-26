@@ -1,11 +1,178 @@
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/plantillas/base.zul"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 
 <zk>
 	<include self="@{define(menu)}" src="/WEB-INF/plantillas/menu.zul" />
-	<window self="@{define(contenido)}" title=" Gestión de artículos "
-		border="normal">
+	<window self="@{define(contenido)}" title="Gestión de artículos"
+		border="normal" apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('es.uvigo.mei.pedidos.vista.ArticuloVM')"
+		vflex="1" validationMessages="@id('vmsgs')">
 
-		<button label="Prueba" />
+		<groupbox mold="3d" closable="false">
+			<caption label="Buscador de artículos">
+				<hlayout>
+					<vlayout>
+						<hlayout>
+							<textbox width="350px"
+								value="@bind(vm.textoBusqueda)" />
+
+							<button label="Buscar ID"
+								onClick="@command('buscarID')" />
+							<button label="Buscar Nombre"
+								onClick="@command('buscarNombre')" />
+						</hlayout>
+						<hlayout>
+							<label value="Familia:" />
+							<listbox mold="select"
+								model="@load(vm.familias)"
+								selectedItem="@bind(vm.familiaSeleccionada)">
+								<template name="model" var="familia">
+									<listitem
+										label="@load(c:cat4(familia.nombre, ' [', familia.descripcion, ']'))"
+										value="@bind(familia)" />
+								</template>
+							</listbox>
+							<button label="Buscar Familia"
+								onClick="@command('buscarFamilia')" />
+						</hlayout>
+					</vlayout>
+					<button label="Ver todos"
+						onClick="@command('buscarTodos')" />
+
+					<space width="50px" />
+
+					<button label="Nuevo articulo"
+						onClick="@command('nuevoArticulo')" />
+
+				</hlayout>
+			</caption>
+
+			<listbox model=" @load(vm.articulos)"
+				emptyMessage="No hay artículos que mostrar" rows="5"
+				sizedByContent="true" span="true">
+				<listhead>
+					<listheader label="ID" />
+					<listheader label="Nombre" />
+					<listheader label="Descripción" />
+					<listheader label="Familia" />
+					<listheader label="Precio" />
+					<listheader hflex="min" />
+				</listhead>
+				<template name="model" var="articulo">
+					<listitem>
+						<listcell>
+							<label value="@bind(articulo.id)" />
+						</listcell>
+						<listcell>
+							<label value="@bind(articulo.nombre)" />
+						</listcell>
+						<listcell>
+							<label value="@bind(articulo.descripcion)" />
+						</listcell>
+						<listcell>
+							<label
+								value="@bind(articulo.familia.nombre)" />
+						</listcell>
+						<listcell>
+							<label
+								value="@bind(articulo.precioUnitario)" />
+						</listcell>
+						<listcell>
+							<hlayout>
+								<button label="Editar"
+									onClick="@command('editar', articuloEditar=articulo)" />
+								<button label="Eliminar"
+									onClick="@command('eliminar', articuloEliminar=articulo)" />
+							</hlayout>
+						</listcell>
+					</listitem>
+				</template>
+			</listbox>
+		</groupbox>
+		<separator />
+
+		<window title="Editor de articulos" mode="modal" closable="true"
+			border="normal" position="center"
+			onClose="self.setVisible(false); event.stopPropagation()"
+			form="@id('articulo') @load(vm.articuloActual) @save(vm.articuloActual, before='guardarArticulo')"
+			visible="@load(not empty vm.articuloActual)">
+			<hlayout>
+				<vlayout>
+					<grid hflex="min">
+						<rows>
+							<row>
+								<label value="ID:" />
+								<label value="@load(articulo.id)" />
+							</row>
+							<row>
+								<label value="Nombre:" />
+								<textbox value="@bind(articulo.nombre)"
+									width="450px" constraint="no empty" />
+							</row>
+							<row>
+								<label value="Descripción" />
+								<textbox
+									value="@bind(articulo.descripcion)" width="450px" />
+							</row>
+							<row>
+								<label value="Familia:" />
+								<listbox mold="select"
+									model="@load(vm.familias)"
+									selectedItem="@bind(articulo.familia)">
+									<template name="model"
+										var="familia">
+										<listitem
+											label="@load(c:cat4(familia.nombre, ' [', familia.descripcion, ']'))"
+											value="@bind(familia)" />
+									</template>
+								</listbox>
+							</row>
+							<row>
+								<label value="Precio unitario:" />
+								<decimalbox
+									value="@bind(articulo.precioUnitario)" width="150px"
+									format="#####.##"
+									constraint="no negative: Valor incorrecto (precio no puede ser negativo)" />
+							</row>
+						</rows>
+					</grid>
+					<hlayout>
+						<button label="Guardar"
+							disabled="@load(not articuloStatus.dirty)"
+							onClick="@command('guardarArticulo')" />
+
+						<button label="Cancelar"
+							onClick="@command('cancelarEdicion')" />
+					</hlayout>
+				</vlayout>
+
+				<listbox
+					model=" @load(vm.recuperarStockArticuloActual())"
+					emptyMessage="No hay stock que mostrar" rows="5"
+					sizedByContent="true" disabled="true">
+					<listhead>
+						<listheader label="Almacen" hflex="min"/>
+						<listheader label="Localidad" hflex="min"/>
+						<listheader label="StocK" hflex="min"/>
+					</listhead>
+					<template name="model" var="stock">
+						<listitem>
+							<listcell>
+								<label
+									value="@bind(stock.almacen.nombre)" />
+							</listcell>
+							<listcell>
+								<label
+									value="@bind(stock.almacen.direccion.localidad)" />
+							</listcell>
+							<listcell>
+								<label value="@bind(stock.stock)" />
+							</listcell>
+						</listitem>
+					</template>
+				</listbox>
+			</hlayout>
+		</window>
 
 	</window>
 </zk>

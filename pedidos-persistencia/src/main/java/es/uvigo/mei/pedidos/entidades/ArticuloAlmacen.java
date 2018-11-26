@@ -29,8 +29,34 @@ public class ArticuloAlmacen implements Serializable {
         this.almacen = almacen;
         this.stock = stock;
     }
+    
+    
 
-    @Override
+    public Articulo getArticulo() {
+		return articulo;
+	}
+
+	public void setArticulo(Articulo articulo) {
+		this.articulo = articulo;
+	}
+
+	public Almacen getAlmacen() {
+		return almacen;
+	}
+
+	public void setAlmacen(Almacen almacen) {
+		this.almacen = almacen;
+	}
+
+	public Integer getStock() {
+		return stock;
+	}
+
+	public void setStock(Integer stock) {
+		this.stock = stock;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 5;
         hash = 53 * hash + Objects.hashCode(this.articulo);

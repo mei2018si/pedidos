@@ -2,9 +2,86 @@
 
 <zk>
 	<include self="@{define(menu)}" src="/WEB-INF/plantillas/menu.zul" />
-	<window self="@{define(contenido)}"
-		title="Gestión de familias de artículos" border="normal">
+	<window self="@{define(contenido)}" title="Gestión de familias"
+		border="normal" apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('es.uvigo.mei.pedidos.vista.FamiliaVM')"
+		validationMessages="@id('vmsgs')">
 
-		<button label="Prueba" />
+		<listbox model=" @load(vm.familias)"
+			selectedItem="@save(vm.familiaActual)"
+			emptyMessage="No hay familias que mostrar" rows="5"
+			sizedByContent="true" span="true">
+			<listhead>
+				<listheader label="ID" />
+				<listheader label="Nombre" />
+				<listheader label="Descripcion" />
+				<listheader hflex="min" />
+			</listhead>
+			<template name="model" var="familia">
+				<listitem>
+					<listcell>
+						<label value="@bind(familia.id)" />
+					</listcell>
+					<listcell>
+						<label value="@bind(familia.nombre)" />
+					</listcell>
+					<listcell>
+						<label value="@bind(familia.descripcion)" />
+					</listcell>
+					<listcell>
+						<hlayout>
+							<button label="Editar"
+								onClick="@command('editar', familiaEditar=familia)" />
+							<button label="Eliminar"
+								onClick="@command('eliminar', familiaEliminar=familia)" />
+						</hlayout>
+					</listcell>
+				</listitem>
+			</template>
+		</listbox>
+
+		<separator />
+
+		<button label="Nueva familia"
+			onClick="@command('nuevaFamilia')" />
+
+		<separator />
+
+		<panel title="Editor de familias" border="normal"
+			focus="@load(not empty vm.familiaActual)"
+			visible="@load(not empty vm.familiaActual)"
+			form="@id('familia') @load(vm.familiaActual) @save(vm.familiaActual, before='guardarFamilia')">
+			<panelchildren>
+				<grid hflex="min">
+					<rows>
+						<row>
+							<label value="ID:" />
+							<label value="@bind(familia.id)" />
+						</row>
+						<row>
+							<label value="Nombre:" />
+							<textbox value="@bind(familia.nombre)"
+								width="450px" constraint="no empty" />
+						</row>
+						<row>
+							<label value="Descripción:" />
+							<textbox value="@bind(familia.descripcion)"
+								width="450px" />
+						</row>
+					</rows>
+				</grid>
+				<hlayout>
+					<button label="Guardar"
+						disabled="@load(not familiaStatus.dirty)"
+						onClick="@command('guardarFamilia')" />
+
+					<button label="Cancelar"
+						disabled="@load(not familiaStatus.dirty)"
+						onClick="@command('cancelarEdicion')" />
+				</hlayout>
+
+			</panelchildren>
+		</panel>
+
 	</window>
 </zk>

@@ -96,3 +96,16 @@ cat src/main/webapp/WEB-INF/zk.xml
 </zk>
 
 ```
+
+### Añadidos 26/11/2018
+* En `pedidos-persistence`
+   * Constructores de la entidad `ArticuloAlmacen` (constructor vacío necesario en JPA, contructor con las dos claves)
+   * Método `getimporteTotal()` para el atributo calculado `importeTotal` en la entidad `Pedido.java`
+   * PseudoDAOs `FamiliaDAO`, `ArticuloDAO`, `AlmacenDAO` y `PedidoDAO`
+       * `almacenDAO` se encarga de gestionar las entidades `ArticuloAlmacen` que dan soporte al _stock_ de un `Artículo` disponible en un `Almacen`
+
+* En `pedidos-web`
+   * Vistas ZUL para gestión de `Familias`, `Productos` u `Almacenes` (con sus respectivos _ViewModel_)
+   * PEDIENTE: 
+      * Vista para gestión y creación de `Pedidos`
+      * Detalles e inconsistencias en las vistas

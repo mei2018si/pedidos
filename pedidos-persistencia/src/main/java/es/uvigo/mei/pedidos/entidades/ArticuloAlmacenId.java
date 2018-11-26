@@ -7,7 +7,18 @@ public class ArticuloAlmacenId implements Serializable{
     private Long articulo;
     private Long almacen;
 
-    @Override
+    
+    public ArticuloAlmacenId() {
+		super();
+	}
+
+	public ArticuloAlmacenId(Long articulo, Long almacen) {
+		super();
+		this.articulo = articulo;
+		this.almacen = almacen;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 3;
         hash = 97 * hash + Objects.hashCode(this.articulo);

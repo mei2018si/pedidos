@@ -1,10 +1,271 @@
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/plantillas/base.zul"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 
 <zk>
 	<include self="@{define(menu)}" src="/WEB-INF/plantillas/menu.zul" />
-	<window self="@{define(contenido)} }" title="Gestión de almacenes"
-		border="normal">
+	<window self="@{define(contenido)}" title="Gestión de almacenes"
+		border="normal" apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('es.uvigo.mei.pedidos.vista.AlmacenVM')"
+		vflex="1" validationMessages="@id('vmsgs')">
 
-		<button label="Prueba" />
+		<groupbox mold="3d" closable="false">
+			<caption label="Buscador de almacenes">
+				<hlayout hflex="min">
+					<textbox width="350px"
+						value="@bind(vm.textoBusqueda)" />
+
+					<button label="Buscar ID"
+						onClick="@command('buscarID')" />
+					<button label="Buscar Nombre"
+						onClick="@command('buscarNombre')" />
+					<button label="Buscar Localidad"
+						onClick="@command('buscarLocalidad')" />
+					<button label="Ver todos"
+						onClick="@command('buscarTodos')" />
+
+					<space width="50px" />
+
+					<button label="Nuevo almacen"
+						onClick="@command('nuevoAlmacen')" />
+
+				</hlayout>
+			</caption>
+
+			<listbox model=" @load(vm.almacenes)"
+				emptyMessage="No hay almacenes que mostrar" rows="5"
+				sizedByContent="true" span="true">
+				<listhead>
+					<listheader label="ID" />
+					<listheader label="Nombre" />
+					<listheader label="Descripción" />
+					<listheader label="Domicilio" />
+					<listheader label="Localidad" />
+					<listheader label="Provincia" />
+					<listheader label="Cod. Postal" />
+					<listheader label="Teléfono" />
+					<listheader hflex="min" />
+				</listhead>
+				<template name="model" var="almacen">
+					<listitem>
+						<listcell>
+							<label value="@bind(almacen.id)" />
+						</listcell>
+						<listcell>
+							<label value="@bind(almacen.nombre)" />
+						</listcell>
+						<listcell>
+							<label value="@bind(almacen.descripcion)" />
+						</listcell>
+						<listcell>
+							<label
+								value="@bind(almacen.direccion.domicilio)" />
+						</listcell>
+						<listcell>
+							<label
+								value="@bind(almacen.direccion.localidad)" />
+						</listcell>
+						<listcell>
+							<label
+								value="@bind(almacen.direccion.provincia)" />
+						</listcell>
+						<listcell>
+							<label
+								value="@bind(almacen.direccion.codigoPostal)" />
+						</listcell>
+						<listcell>
+							<label
+								value="@bind(almacen.direccion.telefono)" />
+						</listcell>
+						<listcell>
+							<hlayout>
+								<button label="Editar"
+									onClick="@command('editar', almacenEditar=almacen)" />
+								<button label="Eliminar"
+									onClick="@command('eliminar', almacenEliminar=almacen)" />
+							</hlayout>
+						</listcell>
+					</listitem>
+				</template>
+			</listbox>
+		</groupbox>
+		<separator />
+
+		<window title="Editor de almacenes" mode="modal" closable="true"
+			border="normal" position="center"
+			onClose="self.setVisible(false); event.stopPropagation()"
+			form="@id('almacen') @load(vm.almacenActual) @save(vm.almacenActual, before='guardarAlmacen')"
+			visible="@load(not empty vm.almacenActual)">
+			<tabbox>
+				<tabs id="tabs">
+					<tab label="Detalles almacén" />
+					<tab label="Stock artículos" />
+				</tabs>
+				<tabpanels>
+					<tabpanel>
+						<grid hflex="min">
+							<rows>
+								<row>
+									<label value="ID:" />
+									<label value="@load(almacen.id)" />
+								</row>
+								<row>
+									<label value="Nombre:" />
+									<textbox
+										value="@bind(almacen.nombre)" width="450px" />
+								</row>
+								<row>
+									<label value="Descripción:" />
+									<textbox
+										value="@bind(almacen.descripcion)" width="450px" />
+								</row>
+								<row>
+									<label value="Domicilio:" />
+									<textbox
+										value="@bind(almacen.direccion.domicilio)" width="450px" />
+								</row>
+								<row>
+									<label value="Localidad:" />
+									<textbox
+										value="@bind(almacen.direccion.localidad)" width="350px" />
+								</row>
+								<row>
+									<label value="Cod. Postal:" />
+									<textbox
+										value="@bind(almacen.direccion.codigoPostal)" width="150px"
+										constraint="/[0-9]{5}/: Formato incorrecto (se exigen 5 dígitos)" />
+								</row>
+								<row>
+									<label value="Provincia:" />
+									<textbox
+										value="@bind(almacen.direccion.provincia)" width="350px" />
+								</row>
+								<row>
+									<label value="Telefono:" />
+									<textbox
+										value="@bind(almacen.direccion.telefono)" width="250px"
+										constraint="/[0-9]{9}/: Formato incorrecto (se exigen 9 dígitos)" />
+								</row>
+							</rows>
+						</grid>
+						<hlayout>
+							<button label="Guardar"
+								disabled="@load(not almacenStatus.dirty)"
+								onClick="@command('guardarAlmacen')" />
+
+							<button label="Cancelar"
+								onClick="@command('cancelarEdicion')" />
+						</hlayout>
+					</tabpanel>
+					<tabpanel 
+						visible="@load(not vm.edicionNuevoAlmacen)">
+						<listbox
+							model=" @load(vm.stocksAlmacenActual)"
+							selectedItem="@bind(vm.stockActual)"
+							emptyMessage="No hay stock de artículos que mostrar" rows="5"
+							sizedByContent="true" span="true">
+							<listhead>
+								<listheader label="Nombre" />
+								<listheader label="Descripción" />
+								<listheader label="Precio" />
+								<listheader label="Stock" />
+								<listheader hflex="min" />
+							</listhead>
+							<template name="model" var="stock">
+								<listitem>
+									<listcell>
+										<label
+											value="@bind(stock.articulo.nombre)" />
+									</listcell>
+									<listcell>
+										<label
+											value="@bind(stock.articulo.descripcion)" />
+									</listcell>
+									<listcell>
+										<label
+											value="@bind(stock.stock)" />
+									</listcell>
+									<listcell>
+										<hlayout>
+											<button label="Editar"
+												onClick="@command('editarStock', stockEditar=stock)" />
+											<button label="Eliminar"
+												onClick="@command('eliminarStock', stockEliminar=stock)" />
+										</hlayout>
+									</listcell>
+								</listitem>
+							</template>
+						</listbox>
+
+						<separator />
+						
+						<button label="Añadir artículo"
+							onClick="@command('nuevoStock')" />
+							
+						<separator />
+
+						<panel title="Editor de Stock de artículos"
+							border="normal" 
+							visible="@load(not empty vm.stockActual)"
+							form="@id('stock') @load(vm.stockActual) @save(vm.stockActual, before='guardarStock')">
+							<panelchildren>
+								<grid >
+									<rows>
+										<row>
+											<label value="Artículo:" />
+											<listbox mold="select" sizedByContent="true"
+												model="@load(vm.recuperarArticulos())"
+												selectedItem="@bind(stock.articulo)" >
+												<template name="model"
+													var="articulo">
+													<listitem
+														label="@load(c:cat4(articulo.nombre, ' [', articulo.descripcion, ']'))"
+														value="@bind(articulo)" />
+												</template>
+											</listbox>
+											<label
+												value="@bind(stock.articulo.nombre)" />
+										</row>
+										<row>
+											<label value="Descripción:" />
+											<label
+												value="@bind(stock.articulo.descripcion)" />
+										</row>
+										<row>
+											<label value="Familia:" />
+											<label
+												value="@bind(stock.articulo.familia.nombre)" />
+										</row>
+										<row>
+											<label value="Precio:" />
+											<label
+												value="@bind(stock.articulo.precioUnitario)" />
+										</row>
+										<row>
+											<label value="Stock:" />
+											<spinner
+												value="@bind(stock.stock)"
+												constraint="no empty, no negative" />
+										</row>
+									</rows>
+								</grid>
+								<separator />
+
+								<hlayout>
+									<button label="Guardar"
+										disabled="@load(not stockStatus.dirty)"
+										onClick="@command('guardarStock')" />
+
+									<button label="Cancelar"
+										disabled="@load(not stockStatus.dirty)"
+										onClick="@command('cancelarEdicionStock')" />
+								</hlayout>
+
+							</panelchildren>
+						</panel>
+					</tabpanel>
+				</tabpanels>
+			</tabbox>
+		</window>
+
 	</window>
 </zk>

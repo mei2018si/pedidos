@@ -6,6 +6,6 @@
 	<window self="@{define(contenido)}" title="Gestión de pedidos"
 		border="normal">
 
-		<button label="Prueba" />
+		<label value="Pendiente" />
 	</window>
 </zk>

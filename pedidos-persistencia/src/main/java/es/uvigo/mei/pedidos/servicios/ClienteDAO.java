@@ -14,7 +14,6 @@ public class ClienteDAO {
 
 	public ClienteDAO(EntityManager em) {
 		super();
-		System.out.println("Entra con " + em.getProperties().toString());
 		this.em = em;
 	}
 

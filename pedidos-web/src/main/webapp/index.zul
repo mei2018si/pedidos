@@ -6,7 +6,6 @@
 	<window self="@{define(contenido)} }" title="Página principal"
 		border="normal">
 
-		<button label="Prueba" />
-
+		
 	</window>
 </zk>

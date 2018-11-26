@@ -95,6 +95,7 @@ public class ClienteVM {
 	public void editar(@BindingParam("clienteEditar") Cliente cliente) {
 		if (cliente != null) {
 			clienteActual = cliente;
+			edicionNuevoCliente = false;
 		}
 	}
 
